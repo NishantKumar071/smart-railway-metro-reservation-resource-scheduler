@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRCTC Next Generation eTicketing System | Smart Railway Reservation</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- IRCTC Top Navigation Bar -->
+    <header class="irctc-top-bar">
+        <div class="top-bar-inner">
+            <div class="irctc-branding">
+                <div class="logo-box">
+                    <!-- Indian Railways official style logo -->
+                    <div class="rail-emblem">IRCTC</div>
+                </div>
+                <div class="branding-text">
+                    <span class="govt-title">INDIAN RAILWAYS / CENTRE FOR RAILWAY INFORMATION SYSTEMS (CRIS)</span>
+                    <h1 class="main-title">IRCTC Next Generation eTicketing System</h1>
+                    <div class="govt-badges">
+                        <span class="badge badge-official">Official Indian Railways Portal</span>
+                        <span class="badge badge-secure">🔒 256-Bit SSL Encrypted</span>
+                        <span class="badge badge-iso">ISO 9001:2015 Certified</span>
+                        <span class="badge badge-support">24x7 Customer Care: 139</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="top-bar-right">
+                <div class="live-clock" id="live-clock">--:--:-- IST</div>
+                <div class="server-status-pill">
+                    <span class="pulse-indicator"></span>
+                    <span>C++ Engine: <strong>ONLINE (Port 8080)</strong></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Navigation Ribbon -->
+    <nav class="main-nav-ribbon">
+        <div class="nav-ribbon-inner">
+            <button class="nav-tab active" onclick="switchTab('booking')">🚆 BOOK TICKET</button>
+            <button class="nav-tab" onclick="switchTab('pnr')">🎫 PNR ENQUIRY &amp; CANCEL</button>
+            <button class="nav-tab" onclick="switchTab('telemetry')">📊 OS &amp; DBMS LIVE TELEMETRY</button>
+            <button class="nav-tab" onclick="switchTab('concurrency')">⚡ CONCURRENCY STRESS TEST</button>
+            <button class="nav-tab" onclick="switchTab('sync')">🔄 LIVE ROUTE SYNC</button>
+        </div>
+    </nav>
+
+    <!-- App Body Container -->
+    <div class="app-container">
+
+        <!-- =================================================================== -->
+        <!-- TAB 1: IRCTC TRAIN SEARCH & BOOKING ENGINE -->
+        <!-- =================================================================== -->
+        <section id="tab-booking" class="tab-pane active">
+            <!-- Search Widget -->
+            <div class="irctc-search-widget">
+                <div class="search-widget-header">
+                    <h2>BOOK YOUR TICKET</h2>
+                    <span class="sub-notice">Real Indian Railways Express Routes (Vande Bharat, Rajdhani, Shatabdi)</span>
+                </div>
+
+                <div class="search-fields-grid">
+                    <!-- From Station -->
+                    <div class="input-card">
+                        <label for="src-station">From Station</label>
+                        <select id="src-station">
+                            <option value="">All Stations (Show All Trains)</option>
+                            <option value="NDLS" selected>NDLS - New Delhi Railway Station</option>
+                            <option value="MMCT">MMCT - Mumbai Central</option>
+                            <option value="HWH">HWH - Howrah Junction (Kolkata)</option>
+                            <option value="MAS">MAS - MGR Chennai Central</option>
+                            <option value="SBC">SBC - KSR Bengaluru City</option>
+                            <option value="BSB">BSB - Varanasi Junction</option>
+                            <option value="LKO">LKO - Lucknow Charbagh</option>
+                            <option value="PNBE">PNBE - Patna Junction</option>
+                            <option value="ADI">ADI - Ahmedabad Junction</option>
+                            <option value="PUNE">PUNE - Pune Junction</option>
+                            <option value="TVC">TVC - Thiruvananthapuram Central</option>
+                        </select>
+                    </div>
+
+                    <!-- Swap Button -->
+                    <div class="swap-col">
+                        <button class="swap-btn" onclick="swapStations()" title="Swap Origin & Destination">⇄</button>
+                    </div>
+
+                    <!-- To Station -->
+                    <div class="input-card">
+                        <label for="dst-station">To Station</label>
+                        <select id="dst-station">
+                            <option value="">All Stations</option>
+                            <option value="BSB" selected>BSB - Varanasi Junction</option>
+                            <option value="MMCT">MMCT - Mumbai Central</option>
+                            <option value="NDLS">NDLS - New Delhi</option>
+                            <option value="HWH">HWH - Howrah Junction</option>
+                            <option value="MAS">MAS - Chennai Central</option>
+                            <option value="SBC">SBC - Bengaluru City</option>
+                            <option value="LKO">LKO - Lucknow</option>
+                            <option value="PNBE">PNBE - Patna</option>
+                            <option value="TVC">TVC - Trivandrum</option>
+                        </select>
+                    </div>
+
+                    <!-- Travel Date -->
+                    <div class="input-card">
+                        <label for="travel-date">Journey Date</label>
+                        <input type="date" id="travel-date">
+                        <div class="date-quick-chips">
+                            <button type="button" class="date-chip" onclick="setQuickDate(0)">Today</button>
+                            <button type="button" class="date-chip" onclick="setQuickDate(1)">Tomorrow</button>
+                            <button type="button" class="date-chip" onclick="setQuickDate(2)">Day After</button>
+                        </div>
+                    </div>
+
+                    <!-- Quota Filter -->
+                    <div class="input-card">
+                        <label for="quota-filter">Booking Quota</label>
+                        <select id="quota-filter">
+                            <option value="NORMAL" selected>GENERAL (Priority 4)</option>
+                            <option value="SENIOR_CITIZEN">LOWER BERTH / SR. CITIZEN (Priority 2)</option>
+                            <option value="TATKAL">TATKAL (Priority 3)</option>
+                            <option value="EMERGENCY">EMERGENCY / VIP DUTY (Priority 1)</option>
+                        </select>
+                    </div>
+
+                    <!-- Search Button -->
+                    <div class="search-action-col">
+                        <button class="btn-irctc-search" onclick="searchTrains()">SEARCH TRAINS</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Train Search Results Banner -->
+            <div class="results-header-bar">
+                <div class="results-summary">
+                    <span id="results-count-text">Showing Available Trains</span>
+                    <span class="route-tag" id="current-search-route">NDLS &rarr; BSB</span>
+                </div>
+                <div class="sort-options">
+                    <span class="filter-tip">Showing live seat inventory from MySQL 8.0 InnoDB</span>
+                </div>
+            </div>
+
+            <!-- Train Cards Container -->
+            <div id="trains-list" class="trains-container">
+                <!-- Populated dynamically via app.js -->
+            </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- TAB 2: PNR ENQUIRY & CANCELLATION -->
+        <!-- =================================================================== -->
+        <section id="tab-pnr" class="tab-pane">
+            <div class="pnr-split-grid">
+                <!-- Check PNR -->
+                <div class="white-card">
+                    <div class="card-title-bar">
+                        <span class="icon">🔍</span>
+                        <h3>CHECK PNR STATUS</h3>
+                    </div>
+                    <p class="card-instruction">Enter your 10-digit Passenger Name Record (PNR) number to inspect live booking status, coach, seat berth, and quota.</p>
+                    <div class="pnr-search-bar">
+                        <input type="text" id="pnr-input" placeholder="e.g. 248-1938502" maxlength="15">
+                        <button class="btn btn-irctc" onclick="checkPNR()">GET STATUS</button>
+                    </div>
+                    <div id="pnr-result-box" class="pnr-details-box"></div>
+                </div>
+
+                <!-- Cancel Ticket -->
+                <div class="white-card">
+                    <div class="card-title-bar">
+                        <span class="icon">❌</span>
+                        <h3>CANCEL TICKET &amp; AUTOMATIC WL PROMOTION</h3>
+                    </div>
+                    <p class="card-instruction">Cancelling a confirmed ticket triggers an atomic ACID DBMS transaction that automatically promotes the highest-priority waiting-list passenger to CONFIRMED.</p>
+                    <div class="pnr-search-bar">
+                        <input type="text" id="cancel-pnr-input" placeholder="Enter PNR to cancel" maxlength="15">
+                        <button class="btn btn-danger-irctc" onclick="cancelTicket()">CANCEL TICKET</button>
+                    </div>
+                    <div id="cancel-result-box" class="pnr-details-box"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- TAB 3: LIVE OS & DBMS TELEMETRY -->
+        <!-- =================================================================== -->
+        <section id="tab-telemetry" class="tab-pane">
+            <div class="telemetry-stats-row">
+                <div class="metric-card">
+                    <div class="metric-label">OS WORKER THREADS</div>
+                    <div class="metric-num" id="stat-active-threads">6</div>
+                    <div class="metric-footnote">Concurrent OS consumer threads</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">PRIORITY QUEUE DEPTH</div>
+                    <div class="metric-num text-orange" id="stat-queue-size">0</div>
+                    <div class="metric-footnote">Requests awaiting CPU dispatch</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">MUTEX CONTENTION EVENTS</div>
+                    <div class="metric-num text-red" id="stat-contention">0</div>
+                    <div class="metric-footnote">Race conditions serialized by lock</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">DBMS TRANSACTIONS COMMITTED</div>
+                    <div class="metric-num text-green" id="stat-commits">0</div>
+                    <div class="metric-footnote">ACID commits to InnoDB</div>
+                </div>
+            </div>
+
+            <!-- Priority Scheduling Stats -->
+            <div class="white-card mt-3">
+                <div class="card-title-bar">
+                    <span class="icon">⚡</span>
+                    <h3>OS PRIORITY SCHEDULING DISPATCH RATIO</h3>
+                </div>
+                <div class="priority-chart-bars">
+                    <div class="p-bar-item">
+                        <div class="p-bar-header">
+                            <span class="quota-pill q-emg">Priority 1: Emergency / VIP / Medical</span>
+                            <span id="stat-emg-count">0 served</span>
+                        </div>
+                        <div class="progress-track"><div id="bar-emg" class="progress-fill fill-red" style="width: 0%"></div></div>
+                    </div>
+
+                    <div class="p-bar-item">
+                        <div class="p-bar-header">
+                            <span class="quota-pill q-senior">Priority 2: Lower Berth / Senior Citizen (Age &ge; 60)</span>
+                            <span id="stat-senior-count">0 served</span>
+                        </div>
+                        <div class="progress-track"><div id="bar-senior" class="progress-fill fill-orange" style="width: 0%"></div></div>
+                    </div>
+
+                    <div class="p-bar-item">
+                        <div class="p-bar-header">
+                            <span class="quota-pill q-tatkal">Priority 3: Tatkal (Last Minute Express)</span>
+                            <span id="stat-tatkal-count">0 served</span>
+                        </div>
+                        <div class="progress-track"><div id="bar-tatkal" class="progress-fill fill-yellow" style="width: 0%"></div></div>
+                    </div>
+
+                    <div class="p-bar-item">
+                        <div class="p-bar-header">
+                            <span class="quota-pill q-normal">Priority 4: General (Standard FCFS)</span>
+                            <span id="stat-normal-count">0 served</span>
+                        </div>
+                        <div class="progress-track"><div id="bar-normal" class="progress-fill fill-blue" style="width: 0%"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transactions Log Table -->
+            <div class="white-card mt-3">
+                <div class="card-title-bar flex-between">
+                    <div>
+                        <span class="icon">💾</span>
+                        <h3 style="display: inline-block;">LIVE MySQL 8.0 AUDIT LOG (`db_transactions_log`)</h3>
+                    </div>
+                    <button class="btn btn-sm btn-outline" onclick="fetchTransactions()">Refresh Logs</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="irctc-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>OS Worker</th>
+                                <th>Operation</th>
+                                <th>PNR</th>
+                                <th>Details</th>
+                                <th>Status</th>
+                                <th>Latency</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactions-table-body">
+                            <!-- Populated via app.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- TAB 4: CONCURRENCY STRESS BENCHMARK -->
+        <!-- =================================================================== -->
+        <section id="tab-concurrency" class="tab-pane">
+            <div class="white-card">
+                <div class="card-title-bar">
+                    <span class="icon">⚡</span>
+                    <h3>HIGH-CONCURRENCY RACE CONDITION STRESS BENCHMARK</h3>
+                </div>
+                <p class="card-instruction">
+                    Spawns <strong>20 concurrent threads</strong> in parallel attempting to book the exact same train seats at the identical millisecond.
+                    Proves that our C++ per-train mutex and MySQL <code>SELECT ... FOR UPDATE</code> eliminate race conditions, preventing double-booking and correctly populating the Waiting List.
+                </p>
+
+                <div class="benchmark-action-box">
+                    <button id="run-bench-btn" class="btn btn-warning-irctc" onclick="runConcurrencyBenchmark()">
+                        🚀 FIRE 20 CONCURRENT THREADS SIMULTANEOUSLY
+                    </button>
+                    <span id="bench-status-msg" class="bench-status"></span>
+                </div>
+
+                <div id="bench-results-container" class="bench-results mt-3" style="display: none;"></div>
+            </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- TAB 5: REAL RAILWAY DATA AUTO-SYNC -->
+        <!-- =================================================================== -->
+        <section id="tab-sync" class="tab-pane">
+            <div class="white-card">
+                <div class="card-title-bar">
+                    <span class="icon">🔄</span>
+                    <h3>INDIAN RAILWAYS ROUTE &amp; SCHEDULE AUTO-UPDATER</h3>
+                </div>
+                <p class="card-instruction">
+                    Synchronizes live express routes (Vande Bharat, Rajdhani, Shatabdi) from open Indian Railways repositories and verified IRCTC timetables into your local MySQL database.
+                </p>
+
+                <div class="sync-action-box">
+                    <button id="sync-btn" class="btn btn-irctc" onclick="syncRailwayData()">
+                        🔄 SYNC ROUTES FROM PUBLIC REPOSITORY
+                    </button>
+                    <span id="sync-status-msg" class="bench-status"></span>
+                </div>
+
+                <div class="route-roster mt-3">
+                    <h4>Connected Live Express Routes</h4>
+                    <div class="route-roster-grid">
+                        <div class="route-item">
+                            <strong>Train 22436 / 22435:</strong> New Delhi (NDLS) &harr; Varanasi (BSB) Vande Bharat (759 km)
+                        </div>
+                        <div class="route-item">
+                            <strong>Train 12952 / 12951:</strong> New Delhi (NDLS) &harr; Mumbai Central (MMCT) Rajdhani (1386 km)
+                        </div>
+                        <div class="route-item">
+                            <strong>Train 12302:</strong> New Delhi (NDLS) &rarr; Howrah Jn (HWH) Kolkata Rajdhani (1451 km)
+                        </div>
+                        <div class="route-item">
+                            <strong>Train 12004:</strong> New Delhi (NDLS) &rarr; Lucknow Charbagh (LKO) Shatabdi Express (513 km)
+                        </div>
+                        <div class="route-item">
+                            <strong>Train 20608 / 20607:</strong> KSR Bengaluru (SBC) &harr; Chennai Central (MAS) Vande Bharat (359 km)
+                        </div>
+                        <div class="route-item">
+                            <strong>Train 12626:</strong> New Delhi (NDLS) &rarr; Trivandrum Central (TVC) Kerala Express (3036 km)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- IRCTC PASSENGER BOOKING MODAL -->
+    <!-- =================================================================== -->
+    <div id="booking-modal" class="irctc-modal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <div class="modal-title-wrap">
+                    <h3>PASSENGER DETAILS &amp; TICKET RESERVATION</h3>
+                    <span id="modal-journey-summary" class="journey-chip"></span>
+                </div>
+                <span class="modal-close" onclick="closeBookingModal()">&times;</span>
+            </div>
+
+            <form id="booking-form" onsubmit="handleBookingSubmit(event)">
+                <input type="hidden" id="b-train-no">
+                <input type="hidden" id="b-class">
+                <input type="hidden" id="b-date">
+                <input type="hidden" id="b-fare">
+
+                <div class="modal-body">
+                    <!-- Train & Class Info Banner -->
+                    <div class="booking-notice-card" id="b-notice-card"></div>
+
+                    <!-- Passenger Details Form -->
+                    <div class="form-section-title">Passenger 1 Information</div>
+                    <div class="form-grid">
+                        <div class="f-group col-span-2">
+                            <label>Passenger Full Name *</label>
+                            <input type="text" id="p-name" required placeholder="e.g. Ramesh Kumar" value="">
+                        </div>
+
+                        <div class="f-group">
+                            <label>Age *</label>
+                            <input type="number" id="p-age" required min="1" max="120" placeholder="e.g. 28" value="" onchange="autoDetectSenior()">
+                        </div>
+
+                        <div class="f-group">
+                            <label>Gender *</label>
+                            <select id="p-gender">
+                                <option value="Male" selected>Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Transgender">Transgender</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid mt-2">
+                        <div class="f-group">
+                            <label>Berth Preference</label>
+                            <select id="p-berth-pref">
+                                <option value="NO_PREF" selected>No Preference</option>
+                                <option value="LOWER">Lower Berth</option>
+                                <option value="MIDDLE">Middle Berth</option>
+                                <option value="UPPER">Upper Berth</option>
+                                <option value="SIDE_LOWER">Side Lower</option>
+                                <option value="SIDE_UPPER">Side Upper</option>
+                                <option value="WINDOW">Window Seat</option>
+                            </select>
+                        </div>
+
+                        <div class="f-group">
+                            <label>Food / Catering Choice</label>
+                            <select id="p-food">
+                                <option value="VEG" selected>Vegetarian Meal</option>
+                                <option value="NON_VEG">Non-Vegetarian Meal</option>
+                                <option value="NO_FOOD">No Food Required</option>
+                            </select>
+                        </div>
+
+                        <div class="f-group col-span-2">
+                            <label>Booking Quota &amp; Priority Level *</label>
+                            <select id="p-quota" onchange="updateQuotaExplainer()">
+                                <option value="NORMAL" selected>GENERAL QUOTA (Standard Allocation)</option>
+                                <option value="SENIOR_CITIZEN">LOWER BERTH / SR. CITIZEN (Priority 2 - 40% Concession)</option>
+                                <option value="TATKAL">TATKAL QUOTA (Priority 3 - 30% Premium)</option>
+                                <option value="EMERGENCY">EMERGENCY / VIP DUTY (Priority 1 - Preemptive Scheduling)</option>
+                            </select>
+                            <small id="quota-explainer" class="help-text">Processed through high-availability reservation engine in standard order.</small>
+                        </div>
+                    </div>
+
+                    <div class="form-section-title mt-3">Contact Details for SMS &amp; eTicket</div>
+                    <div class="form-grid">
+                        <div class="f-group">
+                            <label>Mobile Number *</label>
+                            <input type="text" id="p-phone" required placeholder="Enter 10-digit mobile number" value="" maxlength="10">
+                        </div>
+
+                        <div class="f-group">
+                            <label>Email Address</label>
+                            <input type="email" id="p-email" placeholder="passenger@example.com" value="">
+                        </div>
+                    </div>
+
+                    <!-- Payment & Fare Breakdown -->
+                    <div class="fare-breakdown-card mt-3">
+                        <div class="fare-row">
+                            <span>Base Ticket Fare:</span>
+                            <span id="fare-base">&#8377; 0.00</span>
+                        </div>
+                        <div class="fare-row">
+                            <span>IRCTC Convenience Fee &amp; Superfast Charge:</span>
+                            <span>&#8377; 15.00</span>
+                        </div>
+                        <div class="fare-row">
+                            <span>GST (5% AC Coaches):</span>
+                            <span id="fare-gst">&#8377; 0.00</span>
+                        </div>
+                        <div class="fare-row total-fare">
+                            <span>Total Payable Amount:</span>
+                            <span id="fare-total">&#8377; 0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeBookingModal()">CANCEL</button>
+                    <button type="submit" id="btn-submit-booking" class="btn btn-irctc-pay">PAY &amp; ENQUEUE BOOKING</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- OFFICIAL IRCTC ELECTRONIC RESERVATION SLIP (ERS) MODAL -->
+    <!-- =================================================================== -->
+    <div id="ers-modal" class="irctc-modal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-header ers-header-bar">
+                <div class="ers-header-titles">
+                    <h3>ELECTRONIC RESERVATION SLIP (ERS)</h3>
+                    <span>IRCTC Official Passenger Reservation Ticket (Valid for Travel)</span>
+                </div>
+                <span class="modal-close" onclick="closeErsModal()">&times;</span>
+            </div>
+
+            <div class="modal-body ers-printable-body" id="ers-print-area">
+                <!-- ERS Watermark & Details populated via JavaScript -->
+            </div>
+
+            <div class="modal-footer ers-footer">
+                <button class="btn btn-outline" onclick="closeErsModal()">Close</button>
+                <button class="btn btn-irctc" onclick="printErsTicket()">🖨️ PRINT TICKET / SAVE PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script -->
+    <script src="app.js"></script>
+</body>
+</html>

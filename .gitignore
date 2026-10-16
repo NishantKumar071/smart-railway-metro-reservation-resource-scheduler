@@ -1,0 +1,19 @@
+# Build artifacts
+*.obj
+*.pdb
+*.ilk
+*.idb
+*.exp
+
+# Executables
+smart_railway.exe
+concurrency_test.exe
+libmysql.dll
+
+# IDE and OS
+.vs/
+.vscode/
+build/
+*.DS_Store
+__pycache__/
+*.pyc
