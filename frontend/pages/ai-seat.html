@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Berth Recommendation — SmartRail AI+</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><span>🚂</span> SmartRail <span class="brand-accent">AI+</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+        <a href="search.html" class="nav-item"><span class="nav-icon">🔍</span> Search Trains</a>
+        <a href="my-bookings.html" class="nav-item"><span class="nav-icon">🎫</span> My Bookings</a>
+        <a href="pnr.html" class="nav-item"><span class="nav-icon">📋</span> PNR Enquiry</a>
+        <a href="waitlist.html" class="nav-item"><span class="nav-icon">⏳</span> Waitlist Status</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">AI Engine</div>
+        <a href="ai-waitlist.html" class="nav-item"><span class="nav-icon">🤖</span> WL Prediction</a>
+        <a href="ai-recommend.html" class="nav-item"><span class="nav-icon">🎯</span> Train Recommender</a>
+        <a href="ai-seat.html" class="nav-item active"><span class="nav-icon">💺</span> Seat Selection</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">System & OS</div>
+        <a href="telemetry.html" class="nav-item"><span class="nav-icon">⚙️</span> OS Telemetry</a>
+        <a href="admin.html" class="nav-item"><span class="nav-icon">👑</span> Admin Console</a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">💺 AI Seat & Berth Recommender</h1>
+      <p class="page-subtitle">Personalized berth allocations considering passenger age, senior mobility, and physical seating layouts.</p>
+    </div>
+
+    <div class="card" style="margin-bottom: 2rem;">
+      <div class="card-body">
+        <form id="seat-form" class="form-row-3">
+          <div class="form-group">
+            <label class="form-label">Passenger Age</label>
+            <input type="number" id="seat-age" class="form-control" min="1" max="110" value="65" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Gender</label>
+            <select id="seat-gender" class="form-control">
+              <option value="MALE">Male</option>
+              <option value="FEMALE">Female</option>
+              <option value="OTHER">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Berth Preference</label>
+            <select id="seat-pref" class="form-control">
+              <option value="LOWER" selected>Lower Berth</option>
+              <option value="MIDDLE">Middle Berth</option>
+              <option value="UPPER">Upper Berth</option>
+              <option value="SIDE_LOWER">Side Lower</option>
+              <option value="SIDE_UPPER">Side Upper</option>
+            </select>
+          </div>
+          <div class="form-group" style="grid-column: span 3;">
+            <button type="submit" class="btn-primary" style="padding: 0.8rem 2rem;">
+              ⚡ Recommend Best Berth
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Recommendations Output -->
+    <div id="seat-results"></div>
+  </main>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/app.js"></script>
+<script>
+checkAuth();
+
+document.getElementById('seat-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const age = parseInt(document.getElementById('seat-age').value);
+  const gender = document.getElementById('seat-gender').value;
+  const pref = document.getElementById('seat-pref').value;
+  const today = new Date().toISOString().split('T')[0];
+
+  const container = document.getElementById('seat-results');
+  container.innerHTML = '<div class="loading"><div class="spinner"></div> Evaluating coach physical berth layout...</div>';
+
+  try {
+    const res = await API.getSeatRecommendations({
+      train_id: 2,
+      coach_id: 8,
+      journey_date: today,
+      travel_class: '3AC',
+      preferred_berth: pref,
+      passenger_age: age,
+      passenger_gender: gender,
+      is_senior: age >= 60,
+      has_luggage: true
+    });
+
+    if (!res.recommendations || res.recommendations.length === 0) {
+      container.innerHTML = '<div class="card"><div class="card-body empty-state">No free physical seats to evaluate in this coach.</div></div>';
+      return;
+    }
+
+    container.innerHTML = `
+      <div class="card">
+        <div class="card-header"><div class="card-title">Recommended Seats in Coach B1 (3AC)</div></div>
+        <div class="card-body">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+            ${res.recommendations.map(s => `
+              <div style="border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; background: var(--surface-2);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.5rem;">
+                  <span style="font-size:1.25rem; font-weight:800; color:var(--primary);">Seat #${s.seat_number}</span>
+                  <span class="badge badge-success">Match: ${Math.round(s.recommendation_score * 100)}%</span>
+                </div>
+                <div style="font-weight:700; margin-bottom:0.25rem;">Type: ${s.berth_type}</div>
+                <div style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.75rem;">${s.reason}</div>
+                <div style="font-size:0.75rem; color:var(--text-muted);">Bay #${s.bay_number || 1} · ${s.is_window ? 'Window Side' : 'Aisle Side'}</div>
+              </div>
+            `).join('')}
+          </div>
+          <div style="margin-top:1.5rem; background:rgba(37,99,235,0.06); padding:1rem; border-radius:var(--radius-sm); font-size:0.8rem; color:var(--text-secondary);">
+            ℹ️ <strong>System Note:</strong> ${res.note}
+          </div>
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    container.innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  }
+});
+</script>
+</body>
+</html>

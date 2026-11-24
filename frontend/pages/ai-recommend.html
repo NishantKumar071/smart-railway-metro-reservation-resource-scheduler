@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Train Recommendations — SmartRail AI+</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><span>🚂</span> SmartRail <span class="brand-accent">AI+</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+        <a href="search.html" class="nav-item"><span class="nav-icon">🔍</span> Search Trains</a>
+        <a href="my-bookings.html" class="nav-item"><span class="nav-icon">🎫</span> My Bookings</a>
+        <a href="pnr.html" class="nav-item"><span class="nav-icon">📋</span> PNR Enquiry</a>
+        <a href="waitlist.html" class="nav-item"><span class="nav-icon">⏳</span> Waitlist Status</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">AI Engine</div>
+        <a href="ai-waitlist.html" class="nav-item"><span class="nav-icon">🤖</span> WL Prediction</a>
+        <a href="ai-recommend.html" class="nav-item active"><span class="nav-icon">🎯</span> Train Recommender</a>
+        <a href="ai-seat.html" class="nav-item"><span class="nav-icon">💺</span> Seat Selection</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">System & OS</div>
+        <a href="telemetry.html" class="nav-item"><span class="nav-icon">⚙️</span> OS Telemetry</a>
+        <a href="admin.html" class="nav-item"><span class="nav-icon">👑</span> Admin Console</a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">🎯 AI Train Recommender</h1>
+      <p class="page-subtitle">Smart personalized train ranking balancing departure times, budget, and live seat availability.</p>
+    </div>
+
+    <div class="card" style="margin-bottom: 2rem;">
+      <div class="card-body">
+        <form id="rec-form" class="form-row-3">
+          <div class="form-group">
+            <label class="form-label">Route</label>
+            <select id="rec-route" class="form-control">
+              <option value="NDLS-HWH">NDLS (New Delhi) → HWH (Howrah/Kolkata)</option>
+              <option value="NDLS-BCT">NDLS (New Delhi) → BCT (Mumbai Central)</option>
+              <option value="NDLS-BPL">NDLS (New Delhi) → BPL (Bhopal)</option>
+              <option value="NDLS-MAS">NDLS (New Delhi) → MAS (Chennai Central)</option>
+              <option value="NDLS-SBC">NDLS (New Delhi) → SBC (Bengaluru)</option>
+              <option value="NDLS-HYB">NDLS (New Delhi) → HYB (Hyderabad)</option>
+              <option value="NDLS-PNBE">NDLS (New Delhi) → PNBE (Patna)</option>
+              <option value="NDLS-BSB">NDLS (New Delhi) → BSB (Varanasi)</option>
+              <option value="NDLS-DDN">NDLS (New Delhi) → DDN (Dehradun)</option>
+              <option value="NDLS-SVDK">NDLS (New Delhi) → SVDK (Katra/Vaishnodevi)</option>
+              <option value="DDN-NDLS">DDN (Dehradun) → NDLS (New Delhi)</option>
+              <option value="HWH-NDLS">HWH (Howrah) → NDLS (New Delhi)</option>
+              <option value="BCT-NDLS">BCT (Mumbai Central) → NDLS (New Delhi)</option>
+              <option value="BCT-ADI">BCT (Mumbai) → ADI (Ahmedabad)</option>
+              <option value="SBC-NDLS">SBC (Bengaluru) → NDLS (New Delhi)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Preferred Time</label>
+            <select id="rec-time" class="form-control">
+              <option value="MORNING">Morning (06:00 - 12:00)</option>
+              <option value="AFTERNOON">Afternoon (12:00 - 17:00)</option>
+              <option value="EVENING" selected>Evening (17:00 - 21:00)</option>
+              <option value="NIGHT">Night (21:00+)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Budget Range</label>
+            <select id="rec-budget" class="form-control">
+              <option value="LOW">Economy / Budget (&lt; ₹800)</option>
+              <option value="MEDIUM" selected>Mid-range (₹800 - ₹2000)</option>
+              <option value="HIGH">Premium / 1AC (₹2000+)</option>
+            </select>
+          </div>
+          <div class="form-group" style="grid-column: span 3;">
+            <button type="submit" class="btn-primary" style="padding: 0.8rem 2rem;">
+              ⚡ Compute AI Train Recommendations
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Recommendations Results -->
+    <div id="rec-results"></div>
+  </main>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/app.js"></script>
+<script>
+checkAuth();
+
+document.getElementById('rec-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const route = document.getElementById('rec-route').value.split('-');
+  const src = route[0];
+  const dst = route[1];
+  const time = document.getElementById('rec-time').value;
+  const budget = document.getElementById('rec-budget').value;
+  const today = new Date().toISOString().split('T')[0];
+
+  const container = document.getElementById('rec-results');
+  container.innerHTML = '<div class="loading"><div class="spinner"></div> Computing recommendation scores across database records...</div>';
+
+  try {
+    const res = await API.getTrainRecommendations({
+      source_station: src,
+      dest_station: dst,
+      journey_date: today,
+      travel_class: '3AC',
+      budget: budget,
+      preferred_time: time,
+      max_results: 5
+    });
+
+    if (!res.recommendations || res.recommendations.length === 0) {
+      container.innerHTML = '<div class="card"><div class="card-body empty-state">No matching trains found on this route.</div></div>';
+      return;
+    }
+
+    container.innerHTML = res.recommendations.map((t, idx) => `
+      <div class="card" style="margin-bottom: 1.5rem; border-left: 4px solid var(--primary);">
+        <div class="card-header">
+          <div>
+            <span class="badge badge-primary" style="margin-right: 0.5rem;">Rank #${idx + 1}</span>
+            <span style="font-size: 1.15rem; font-weight: 800;">${t.train_number} - ${t.train_name}</span>
+          </div>
+          <div style="text-align: right;">
+            <span style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">${t.recommendation_pct}</span>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Match Score</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="train-info-row" style="margin-bottom: 1rem;">
+            <span>⏰ Departs: <strong>${t.departure_time}</strong> → Arrives: <strong>${t.arrival_time}</strong></span>
+            <span>Duration: <strong>${t.duration}</strong></span>
+            <span>Fare: <strong>₹${t.fare}</strong></span>
+            <span class="badge ${t.available_seats > 0 ? 'badge-success' : 'badge-warning'}">
+              ${t.available_seats > 0 ? `Seats: ${t.available_seats}` : 'Waitlist Only'}
+            </span>
+          </div>
+
+          <div style="background: var(--surface-2); padding: 0.75rem 1rem; border-radius: var(--radius-sm); font-size: 0.85rem;">
+            💡 <strong>Why AI Recommends This:</strong> ${t.reason}
+          </div>
+
+          <div style="margin-top: 1rem; text-align: right;">
+            <a href="search.html?source=${src}&dest=${dst}" class="btn-primary-sm">Proceed to Book</a>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  } catch (err) {
+    container.innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  }
+});
+</script>
+</body>
+</html>

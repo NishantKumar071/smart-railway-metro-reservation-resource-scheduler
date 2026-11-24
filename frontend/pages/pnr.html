@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PNR Enquiry — SmartRail AI+</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><span>🚂</span> SmartRail <span class="brand-accent">AI+</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+        <a href="search.html" class="nav-item"><span class="nav-icon">🔍</span> Search Trains</a>
+        <a href="my-bookings.html" class="nav-item"><span class="nav-icon">🎫</span> My Bookings</a>
+        <a href="pnr.html" class="nav-item active"><span class="nav-icon">📋</span> PNR Enquiry</a>
+        <a href="waitlist.html" class="nav-item"><span class="nav-icon">⏳</span> Waitlist Status</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">AI Engine</div>
+        <a href="ai-waitlist.html" class="nav-item"><span class="nav-icon">🤖</span> WL Prediction</a>
+        <a href="ai-recommend.html" class="nav-item"><span class="nav-icon">🎯</span> Train Recommender</a>
+        <a href="ai-seat.html" class="nav-item"><span class="nav-icon">💺</span> Seat Selection</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">System & OS</div>
+        <a href="telemetry.html" class="nav-item"><span class="nav-icon">⚙️</span> OS Telemetry</a>
+        <a href="admin.html" class="nav-item"><span class="nav-icon">👑</span> Admin Console</a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">PNR Status Enquiry</h1>
+      <p class="page-subtitle">Inspect real-time booking status, passenger seat allotments, and transaction audit trails.</p>
+    </div>
+
+    <!-- PNR Form -->
+    <div class="card" style="margin-bottom: 2rem;">
+      <div class="card-body">
+        <form id="pnr-form" style="display: flex; gap: 1rem; max-width: 600px;">
+          <input type="text" id="pnr-input" class="form-control" required placeholder="Enter 10-digit PNR Number" maxlength="10" pattern="\d{10}">
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">Get Status</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- PNR Details Result -->
+    <div id="pnr-result-container"></div>
+  </main>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/app.js"></script>
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const pnrParam = urlParams.get('pnr');
+if (pnrParam) {
+  document.getElementById('pnr-input').value = pnrParam;
+  fetchPnr(pnrParam);
+}
+
+document.getElementById('pnr-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const pnr = document.getElementById('pnr-input').value.trim();
+  fetchPnr(pnr);
+});
+
+async function fetchPnr(pnr) {
+  const container = document.getElementById('pnr-result-container');
+  container.innerHTML = '<div class="loading"><div class="spinner"></div> Fetching PNR status from database...</div>';
+
+  try {
+    const data = await API.pnrEnquiry(pnr);
+    container.innerHTML = `
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-header">
+          <div>
+            <span style="font-size: 1.25rem; font-weight: 800;">PNR: ${data.pnr}</span>
+            <span class="badge ${data.booking_status === 'CONFIRMED' ? 'badge-success' : data.booking_status === 'WAITING' ? 'badge-warning' : 'badge-danger'}" style="margin-left: 0.75rem;">
+              ${data.booking_status}
+            </span>
+          </div>
+          <div>Fare: <strong>₹${data.total_fare}</strong></div>
+        </div>
+        <div class="card-body">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+            <div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Train</div>
+              <div style="font-weight: 700;">${data.train.number} - ${data.train.name}</div>
+            </div>
+            <div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Route</div>
+              <div style="font-weight: 700;">${data.source.name} → ${data.destination.name}</div>
+            </div>
+            <div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Journey Date</div>
+              <div style="font-weight: 700;">${data.journey_date}</div>
+            </div>
+            <div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Class</div>
+              <div style="font-weight: 700;">${data.travel_class}</div>
+            </div>
+          </div>
+
+          <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.75rem;">Passenger Allotment</h3>
+          <div class="table-wrap" style="margin-bottom: 1.5rem;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Passenger</th>
+                  <th>Age/Gender</th>
+                  <th>Status</th>
+                  <th>Coach</th>
+                  <th>Seat / Berth</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.passengers.map(p => `
+                  <tr>
+                    <td>${p.name}</td>
+                    <td>${p.age} / ${p.gender}</td>
+                    <td><span class="badge ${p.status === 'CONFIRMED' ? 'badge-success' : 'badge-warning'}">${p.status}</span></td>
+                    <td>${p.coach || '—'}</td>
+                    <td>${p.seat ? `${p.seat} (${p.berth || ''})` : p.waitlist_number ? `WL ${p.waitlist_number}` : '—'}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.75rem;">Status History & Audit Trail</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Old Status</th>
+                  <th>New Status</th>
+                  <th>Reason</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.status_history.map(h => `
+                  <tr>
+                    <td>${h.old_status || 'INIT'}</td>
+                    <td><strong>${h.new_status}</strong></td>
+                    <td>${h.reason}</td>
+                    <td>${h.changed_at}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          ${data.booking_status !== 'CANCELLED' ? `
+            <div style="margin-top: 1.5rem; text-align: right;">
+              <button class="btn-danger" onclick="cancelTicket('${data.pnr}')">Cancel This Ticket</button>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    container.innerHTML = `<div class="card"><div class="card-body alert alert-danger">${err.message}</div></div>`;
+  }
+}
+
+async function cancelTicket(pnr) {
+  if (!confirm(`Are you sure you want to cancel ticket with PNR ${pnr}?`)) return;
+  try {
+    const res = await API.cancelBooking(pnr);
+    showToast('Cancelled', `Ticket cancelled. ${res.promoted_pnr ? `Waitlist ticket ${res.promoted_pnr} promoted!` : ''}`, 'success');
+    fetchPnr(pnr);
+  } catch (err) {
+    showToast('Cancellation Failed', err.message, 'error');
+  }
+}
+</script>
+</body>
+</html>

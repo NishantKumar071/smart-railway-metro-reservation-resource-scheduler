@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — SmartRail AI+</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  .auth-wrapper {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%); padding: 1.5rem;
+  }
+  .auth-card {
+    background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-xl);
+    border: 1px solid var(--border); width: 100%; max-width: 440px; padding: 2.5rem;
+  }
+  .auth-header { text-align: center; margin-bottom: 2rem; }
+  .auth-brand { font-size: 1.5rem; font-weight: 800; color: var(--text); }
+  .auth-subtitle { color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem; }
+</style>
+</head>
+<body>
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-brand">🚂 SmartRail <span class="brand-accent">AI+</span></div>
+      <p class="auth-subtitle">Sign in to your reservation account</p>
+    </div>
+
+    <div class="alert alert-info" style="font-size: 0.8rem; margin-bottom: 1.5rem;">
+      <strong>Demo Accounts:</strong><br>
+      • User: <code>nishant@smartrail.local</code> / <code>Demo@123</code><br>
+      • Admin: <code>admin@smartrail.local</code> / <code>Demo@123</code>
+    </div>
+
+    <form id="login-form">
+      <div class="form-group">
+        <label class="form-label" for="username">Username or Email</label>
+        <input type="text" id="username" class="form-control" required placeholder="name@smartrail.local" value="nishant@smartrail.local">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input type="password" id="password" class="form-control" required placeholder="••••••••" value="Demo@123">
+      </div>
+      <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">
+        Sign In
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-secondary);">
+      Don't have an account? <a href="register.html" style="font-weight: 600;">Register here</a>
+    </div>
+    <div style="text-align: center; margin-top: 1rem;">
+      <a href="../index.html" style="font-size: 0.8rem; color: var(--text-muted);">← Back to Homepage</a>
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/app.js"></script>
+<script>
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const u = document.getElementById('username').value.trim();
+  const p = document.getElementById('password').value;
+
+  try {
+    const res = await API.login(u, p);
+    showToast('Success', 'Logged in successfully!', 'success');
+    setTimeout(() => {
+      window.location.href = res.user.role === 'ADMIN' ? 'admin.html' : 'dashboard.html';
+    }, 600);
+  } catch (err) {
+    showToast('Login Failed', err.message, 'error');
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Console — SmartRail AI+</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><span>🚂</span> SmartRail <span class="brand-accent">AI+</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+        <a href="search.html" class="nav-item"><span class="nav-icon">🔍</span> Search Trains</a>
+        <a href="my-bookings.html" class="nav-item"><span class="nav-icon">🎫</span> My Bookings</a>
+        <a href="pnr.html" class="nav-item"><span class="nav-icon">📋</span> PNR Enquiry</a>
+        <a href="waitlist.html" class="nav-item"><span class="nav-icon">⏳</span> Waitlist Status</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">AI Engine</div>
+        <a href="ai-waitlist.html" class="nav-item"><span class="nav-icon">🤖</span> WL Prediction</a>
+        <a href="ai-recommend.html" class="nav-item"><span class="nav-icon">🎯</span> Train Recommender</a>
+        <a href="ai-seat.html" class="nav-item"><span class="nav-icon">💺</span> Seat Selection</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">System & OS</div>
+        <a href="telemetry.html" class="nav-item"><span class="nav-icon">⚙️</span> OS Telemetry</a>
+        <a href="admin.html" class="nav-item active"><span class="nav-icon">👑</span> Admin Console</a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">👑 System Administrator Console</h1>
+      <p class="page-subtitle">Database transaction integrity, revenue analytics, and system-wide audit logs.</p>
+    </div>
+
+    <!-- Admin Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon green">💰</div>
+        <div>
+          <div class="stat-value" id="admin-revenue">₹0</div>
+          <div class="stat-label">Total Revenue</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue">👥</div>
+        <div>
+          <div class="stat-value" id="admin-users">0</div>
+          <div class="stat-label">Registered Passengers</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon purple">🎫</div>
+        <div>
+          <div class="stat-value" id="admin-total-bookings">0</div>
+          <div class="stat-label">All-Time Bookings</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon orange">🛡️</div>
+        <div>
+          <div class="stat-value">InnoDB</div>
+          <div class="stat-label">ACID Engine</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Transactions Log -->
+    <div class="card" style="margin-bottom: 2rem;">
+      <div class="card-header"><div class="card-title">DBMS ACID Transaction Audit Log</div></div>
+      <div class="card-body" style="padding:0;">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Transaction ID</th>
+                <th>Operation</th>
+                <th>Status</th>
+                <th>Execution Time</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="txns-tbody">
+              <tr><td colspan="5" class="loading"><div class="spinner"></div> Loading transactions...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/app.js"></script>
+<script>
+checkAuth();
+
+async function loadAdminData() {
+  try {
+    const data = await API.getAdminMetrics();
+    document.getElementById('admin-revenue').textContent = `₹${data.booking_summary.total_revenue.toLocaleString()}`;
+    document.getElementById('admin-users').textContent = data.total_registered_users;
+    document.getElementById('admin-total-bookings').textContent = data.booking_summary.total;
+
+    const tbody = document.getElementById('txns-tbody');
+    const txns = data.recent_transactions || [];
+
+    if (txns.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No transaction logs available.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = txns.map(t => `
+      <tr>
+        <td><code>${t.transaction_id.substring(0, 16)}...</code></td>
+        <td><strong>${t.operation_type}</strong></td>
+        <td><span class="badge ${t.status === 'COMMITTED' ? 'badge-success' : 'badge-danger'}">${t.status}</span></td>
+        <td>${t.duration_ms || 2} ms</td>
+        <td>${t.created_at}</td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    document.getElementById('txns-tbody').innerHTML = `<tr><td colspan="5" class="alert alert-danger">${err.message}</td></tr>`;
+  }
+}
+
+loadAdminData();
+</script>
+</body>
+</html>

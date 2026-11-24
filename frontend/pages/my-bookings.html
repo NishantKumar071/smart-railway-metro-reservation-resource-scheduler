@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Bookings — SmartRail AI+</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><span>🚂</span> SmartRail <span class="brand-accent">AI+</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+        <a href="search.html" class="nav-item"><span class="nav-icon">🔍</span> Search Trains</a>
+        <a href="my-bookings.html" class="nav-item active"><span class="nav-icon">🎫</span> My Bookings</a>
+        <a href="pnr.html" class="nav-item"><span class="nav-icon">📋</span> PNR Enquiry</a>
+        <a href="waitlist.html" class="nav-item"><span class="nav-icon">⏳</span> Waitlist Status</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">AI Engine</div>
+        <a href="ai-waitlist.html" class="nav-item"><span class="nav-icon">🤖</span> WL Prediction</a>
+        <a href="ai-recommend.html" class="nav-item"><span class="nav-icon">🎯</span> Train Recommender</a>
+        <a href="ai-seat.html" class="nav-item"><span class="nav-icon">💺</span> Seat Selection</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">System & OS</div>
+        <a href="telemetry.html" class="nav-item"><span class="nav-icon">⚙️</span> OS Telemetry</a>
+        <a href="admin.html" class="nav-item"><span class="nav-icon">👑</span> Admin Console</a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">My Bookings</h1>
+      <p class="page-subtitle">View booking history, ticket status, and cancellation management.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-body" style="padding: 0;">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>PNR</th>
+                <th>Train</th>
+                <th>Route</th>
+                <th>Date</th>
+                <th>Class</th>
+                <th>Status</th>
+                <th>Fare</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="my-bookings-list">
+              <tr><td colspan="8" class="loading"><div class="spinner"></div> Loading reservations...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/app.js"></script>
+<script>
+checkAuth();
+
+async function loadBookings() {
+  const tbody = document.getElementById('my-bookings-list');
+  try {
+    const res = await API.getMyBookings();
+    const list = res.bookings || [];
+
+    if (list.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No reservations recorded yet. Book a ticket from Search Trains!</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = list.map(b => `
+      <tr>
+        <td><strong><a href="pnr.html?pnr=${b.pnr}">${b.pnr}</a></strong></td>
+        <td>${b.train_number} - ${b.train_name}</td>
+        <td>${b.source_name} → ${b.dest_name}</td>
+        <td>${b.journey_date}</td>
+        <td><span class="badge badge-info">${b.travel_class}</span></td>
+        <td><span class="badge ${b.booking_status === 'CONFIRMED' ? 'badge-success' : b.booking_status === 'WAITING' ? 'badge-warning' : 'badge-danger'}">${b.booking_status}</span></td>
+        <td>₹${b.total_fare}</td>
+        <td>
+          <a href="pnr.html?pnr=${b.pnr}" class="btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;">View</a>
+        </td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="8" class="alert alert-danger">${err.message}</td></tr>`;
+  }
+}
+
+loadBookings();
+</script>
+</body>
+</html>

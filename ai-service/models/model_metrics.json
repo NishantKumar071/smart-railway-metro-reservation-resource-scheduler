@@ -1,0 +1,57 @@
+{
+  "generated_at": "2026-11-25T00:04:01.339647",
+  "data_disclaimer": "Models trained on SYNTHETIC data. For academic demonstration only.",
+  "waitlist_prediction": {
+    "logistic_regression": {
+      "accuracy": 0.6444,
+      "precision": 0.6243,
+      "recall": 0.6316,
+      "f1_score": 0.6279,
+      "roc_auc": 0.6949,
+      "confusion_matrix": [
+        [
+          124,
+          65
+        ],
+        [
+          63,
+          108
+        ]
+      ]
+    },
+    "random_forest": {
+      "accuracy": 0.6444,
+      "precision": 0.6272,
+      "recall": 0.6199,
+      "f1_score": 0.6235,
+      "roc_auc": 0.6849,
+      "confusion_matrix": [
+        [
+          126,
+          63
+        ],
+        [
+          65,
+          106
+        ]
+      ],
+      "feature_importance": {
+        "wl_ratio": 0.2200489100911404,
+        "days_normalized": 0.10465130833786647,
+        "is_holiday_period": 0.03933555005178312,
+        "historical_cancel_rate": 0.1442487266911169,
+        "is_premium": 0.03420978988011899,
+        "is_emergency": 0.020839264306027543,
+        "class_encoded": 0.03326105584958639,
+        "quota_encoded": 0.04950189515493825,
+        "journey_month": 0.08541147412058944,
+        "days_before_journey": 0.10934418221834562,
+        "waitlist_number": 0.13292594391832332,
+        "max_wl_allowed": 0.026221899380163564
+      }
+    }
+  },
+  "recommendation": {
+    "r2_score": -0.0955
+  }
+}

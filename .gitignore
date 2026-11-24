@@ -1,0 +1,95 @@
+# SmartRail AI+ — .gitignore
+
+# Project archive
+ai_smartrail_complete.zip
+
+# Environment variables (NEVER commit)
+.env
+*.env
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv/
+pip-wheel-metadata/
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# AI Models (large binary files)
+ai-service/models/*.pkl
+ai-service/models/*.joblib
+!ai-service/models/waitlist_predictor.joblib
+!ai-service/models/recommendation_model.joblib
+ai-service/models/*.h5
+!ai-service/models/.gitkeep
+
+# C++ Build Artifacts
+backend/build/
+backend/bin/
+backend/*.exe
+backend/*.o
+backend/*.obj
+*.pdb
+*.ilk
+*.exp
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+
+# Databases
+*.db
+!backend/smartrail_embedded.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+*.pid
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# OS
+desktop.ini
+ehthumbs.db
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+test_results/
+*.test
+
+# Secrets
+*.pem
+*.key
+*.crt
+secrets/

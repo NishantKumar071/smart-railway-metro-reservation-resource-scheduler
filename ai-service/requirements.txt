@@ -1,0 +1,23 @@
+# SmartRail AI+ — Python AI Service Requirements
+
+# Web framework
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
+
+# Data & ML
+pandas==2.2.3
+numpy==1.26.4
+scikit-learn==1.5.2
+joblib==1.4.2
+imbalanced-learn==0.12.4
+
+# Data validation
+pydantic==2.10.4
+pydantic-settings==2.7.0
+
+# Database
+PyMySQL==1.1.1
+
+# Utilities
+python-dotenv==1.0.1
+python-dateutil==2.9.0

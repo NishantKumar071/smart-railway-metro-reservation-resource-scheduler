@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — SmartRail AI+</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span>🚂</span> SmartRail <span class="brand-accent">AI+</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a href="dashboard.html" class="nav-item active"><span class="nav-icon">📊</span> Dashboard</a>
+        <a href="search.html" class="nav-item"><span class="nav-icon">🔍</span> Search Trains</a>
+        <a href="my-bookings.html" class="nav-item"><span class="nav-icon">🎫</span> My Bookings</a>
+        <a href="pnr.html" class="nav-item"><span class="nav-icon">📋</span> PNR Enquiry</a>
+        <a href="waitlist.html" class="nav-item"><span class="nav-icon">⏳</span> Waitlist Status</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">AI Engine</div>
+        <a href="ai-waitlist.html" class="nav-item"><span class="nav-icon">🤖</span> WL Prediction</a>
+        <a href="ai-recommend.html" class="nav-item"><span class="nav-icon">🎯</span> Train Recommender</a>
+        <a href="ai-seat.html" class="nav-item"><span class="nav-icon">💺</span> Seat Selection</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">System & OS</div>
+        <a href="telemetry.html" class="nav-item"><span class="nav-icon">⚙️</span> OS Telemetry</a>
+        <a href="admin.html" class="nav-item" id="admin-nav-link"><span class="nav-icon">👑</span> Admin Console</a>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="sidebar-user-avatar">NK</div>
+        <div style="flex: 1; overflow: hidden;">
+          <div class="user-name" id="sidebar-user-name">Nishant Kumar</div>
+          <div class="user-role" id="sidebar-user-role">Passenger</div>
+        </div>
+        <button onclick="logout()" style="background:none; border:none; color:white; opacity:0.6; cursor:pointer;" title="Logout">🚪</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Passenger Dashboard</h1>
+      <p class="page-subtitle">Welcome back! Manage your reservations and access AI prediction tools.</p>
+    </div>
+
+    <!-- Quick Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon blue">🎫</div>
+        <div>
+          <div class="stat-value" id="stat-total-bookings">0</div>
+          <div class="stat-label">Total Bookings</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">✓</div>
+        <div>
+          <div class="stat-value" id="stat-confirmed-bookings">0</div>
+          <div class="stat-label">Confirmed</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon orange">⏳</div>
+        <div>
+          <div class="stat-value" id="stat-wl-bookings">0</div>
+          <div class="stat-label">Waitlisted</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon purple">🤖</div>
+        <div>
+          <div class="stat-value">64.4%</div>
+          <div class="stat-label">Model Accuracy</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Shortcuts -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Quick Train Search</div>
+          <a href="search.html" class="btn-primary-sm">Full Search</a>
+        </div>
+        <div class="card-body">
+          <form id="quick-search-form" class="form-row-3">
+            <div class="form-group">
+              <label class="form-label">From Station</label>
+              <select id="quick-source" class="form-control">
+                <option value="NDLS">NDLS — New Delhi</option>
+                <option value="DDN">DDN — Dehradun</option>
+                <option value="HWH">HWH — Howrah</option>
+                <option value="BCT">BCT — Mumbai Central</option>
+                <option value="CSMT">CSMT — Mumbai CSMT</option>
+                <option value="SBC">SBC — Bengaluru</option>
+                <option value="MAS">MAS — Chennai Central</option>
+                <option value="HYB">HYB — Hyderabad</option>
+                <option value="BPL">BPL — Bhopal</option>
+                <option value="PNBE">PNBE — Patna</option>
+                <option value="PRYJ">PRYJ — Prayagraj</option>
+                <option value="BSB">BSB — Varanasi</option>
+                <option value="ADI">ADI — Ahmedabad</option>
+                <option value="JP">JP — Jaipur</option>
+                <option value="JAT">JAT — Jammu Tawi</option>
+                <option value="SVDK">SVDK — Katra</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">To Station</label>
+              <select id="quick-dest" class="form-control">
+                <option value="HWH">HWH — Howrah</option>
+                <option value="BCT">BCT — Mumbai Central</option>
+                <option value="CSMT">CSMT — Mumbai CSMT</option>
+                <option value="SBC">SBC — Bengaluru</option>
+                <option value="MAS">MAS — Chennai Central</option>
+                <option value="HYB">HYB — Hyderabad</option>
+                <option value="BPL">BPL — Bhopal</option>
+                <option value="PNBE">PNBE — Patna</option>
+                <option value="DDN">DDN — Dehradun</option>
+                <option value="NDLS">NDLS — New Delhi</option>
+                <option value="PRYJ">PRYJ — Prayagraj</option>
+                <option value="BSB">BSB — Varanasi</option>
+                <option value="ADI">ADI — Ahmedabad</option>
+                <option value="JP">JP — Jaipur</option>
+                <option value="JAT">JAT — Jammu Tawi</option>
+                <option value="SVDK">SVDK — Katra</option>
+              </select>
+            </div>
+            <div class="form-group" style="display: flex; align-items: flex-end;">
+              <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">Search Trains</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">AI Intelligence</div>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <a href="ai-waitlist.html" class="btn-outline" style="justify-content: space-between;">
+            <span>🤖 Waitlist Predictor</span> <span>→</span>
+          </a>
+          <a href="ai-recommend.html" class="btn-outline" style="justify-content: space-between;">
+            <span>🎯 Smart Recommendations</span> <span>→</span>
+          </a>
+          <a href="ai-seat.html" class="btn-outline" style="justify-content: space-between;">
+            <span>💺 AI Berth Selection</span> <span>→</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Bookings Table -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Recent Booking Activity</div>
+        <a href="my-bookings.html" style="font-size: 0.85rem; font-weight: 600;">View All</a>
+      </div>
+      <div class="card-body" style="padding: 0;">
+        <div class="table-wrap">
+          <table id="recent-bookings-table">
+            <thead>
+              <tr>
+                <th>PNR</th>
+                <th>Train</th>
+                <th>Route</th>
+                <th>Date</th>
+                <th>Class</th>
+                <th>Status</th>
+                <th>Fare</th>
+              </tr>
+            </thead>
+            <tbody id="bookings-tbody">
+              <tr><td colspan="7" class="loading"><div class="spinner"></div> Loading bookings...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/app.js"></script>
+<script>
+checkAuth();
+
+document.getElementById('quick-search-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const s = document.getElementById('quick-source').value;
+  const d = document.getElementById('quick-dest').value;
+  window.location.href = `search.html?source=${s}&dest=${d}`;
+});
+
+async function loadDashboardData() {
+  try {
+    const res = await API.getMyBookings();
+    const bookings = res.bookings || [];
+
+    document.getElementById('stat-total-bookings').textContent = bookings.length;
+    const confirmed = bookings.filter(b => b.booking_status === 'CONFIRMED').length;
+    const wl = bookings.filter(b => b.booking_status === 'WAITING').length;
+
+    document.getElementById('stat-confirmed-bookings').textContent = confirmed;
+    document.getElementById('stat-wl-bookings').textContent = wl;
+
+    const tbody = document.getElementById('bookings-tbody');
+    if (bookings.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No bookings found yet. Use Search Trains to make your first booking!</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = bookings.slice(0, 5).map(b => `
+      <tr>
+        <td><strong><a href="pnr.html?pnr=${b.pnr}">${b.pnr}</a></strong></td>
+        <td>${b.train_number} - ${b.train_name}</td>
+        <td>${b.source_name} → ${b.dest_name}</td>
+        <td>${b.journey_date || 'N/A'}</td>
+        <td><span class="badge badge-info">${b.travel_class}</span></td>
+        <td><span class="badge ${b.booking_status === 'CONFIRMED' ? 'badge-success' : b.booking_status === 'WAITING' ? 'badge-warning' : 'badge-danger'}">${b.booking_status}</span></td>
+        <td>₹${b.total_fare}</td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    document.getElementById('bookings-tbody').innerHTML = `<tr><td colspan="7" class="alert alert-danger">${err.message}</td></tr>`;
+  }
+}
+
+loadDashboardData();
+</script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Waitlist Status — SmartRail AI+</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><span>🚂</span> SmartRail <span class="brand-accent">AI+</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+        <a href="search.html" class="nav-item"><span class="nav-icon">🔍</span> Search Trains</a>
+        <a href="my-bookings.html" class="nav-item"><span class="nav-icon">🎫</span> My Bookings</a>
+        <a href="pnr.html" class="nav-item"><span class="nav-icon">📋</span> PNR Enquiry</a>
+        <a href="waitlist.html" class="nav-item active"><span class="nav-icon">⏳</span> Waitlist Status</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">AI Engine</div>
+        <a href="ai-waitlist.html" class="nav-item"><span class="nav-icon">🤖</span> WL Prediction</a>
+        <a href="ai-recommend.html" class="nav-item"><span class="nav-icon">🎯</span> Train Recommender</a>
+        <a href="ai-seat.html" class="nav-item"><span class="nav-icon">💺</span> Seat Selection</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">System & OS</div>
+        <a href="telemetry.html" class="nav-item"><span class="nav-icon">⚙️</span> OS Telemetry</a>
+        <a href="admin.html" class="nav-item"><span class="nav-icon">👑</span> Admin Console</a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Live Waitlist Queue</h1>
+      <p class="page-subtitle">Demonstrates priority order and waiting queue positions for upcoming trains.</p>
+    </div>
+
+    <div class="card" style="margin-bottom: 2rem;">
+      <div class="card-body">
+        <form id="wl-query-form" class="form-row-3">
+          <div class="form-group">
+            <label class="form-label">Train</label>
+            <select id="wl-train-id" class="form-control">
+              <option value="2">12301 — Howrah Rajdhani</option>
+              <option value="7">12017 — Dehradun Shatabdi</option>
+              <option value="3">12951 — Mumbai Rajdhani</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Coach</label>
+            <select id="wl-coach-id" class="form-control">
+              <option value="8">B1 (3AC)</option>
+              <option value="7">S2 (SL)</option>
+              <option value="1">C1 (CC)</option>
+            </select>
+          </div>
+          <div class="form-group" style="display:flex; align-items:flex-end;">
+            <button type="submit" class="btn-primary" style="width:100%; justify-content:center;">View Waitlist Queue</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Current Queue Order</div>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>WL Position</th>
+                <th>PNR</th>
+                <th>Passenger</th>
+                <th>Age/Gender</th>
+                <th>Quota Priority</th>
+                <th>Booking Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="wl-tbody">
+              <tr><td colspan="6" class="empty-state">Select a train to inspect the active waiting list.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/app.js"></script>
+<script>
+checkAuth();
+
+document.getElementById('wl-query-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const trainId = document.getElementById('wl-train-id').value;
+  const coachId = document.getElementById('wl-coach-id').value;
+  const today = new Date().toISOString().split('T')[0];
+
+  const tbody = document.getElementById('wl-tbody');
+  tbody.innerHTML = '<tr><td colspan="6" class="loading"><div class="spinner"></div> Loading queue...</td></tr>';
+
+  try {
+    const res = await API.getWaitlist(trainId, coachId, today);
+    if (!res.waitlist || res.waitlist.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No waitlisted passengers for this coach on selected date.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = res.waitlist.map(w => `
+      <tr>
+        <td><span class="badge badge-warning">WL ${w.waitlist_number}</span></td>
+        <td><strong>${w.pnr}</strong></td>
+        <td>${w.full_name}</td>
+        <td>${w.age} / ${w.gender}</td>
+        <td><span class="badge badge-info">${w.quota} (Priority ${w.priority_level})</span></td>
+        <td>${w.booking_time}</td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="6" class="alert alert-danger">${err.message}</td></tr>`;
+  }
+});
+</script>
+</body>
+</html>

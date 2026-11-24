@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register — SmartRail AI+</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  .auth-wrapper {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%); padding: 1.5rem;
+  }
+  .auth-card {
+    background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-xl);
+    border: 1px solid var(--border); width: 100%; max-width: 480px; padding: 2.5rem;
+  }
+</style>
+</head>
+<body>
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <div style="font-size: 1.5rem; font-weight: 800;">🚂 SmartRail <span class="brand-accent">AI+</span></div>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">Create a new passenger account</p>
+    </div>
+
+    <form id="register-form">
+      <div class="form-group">
+        <label class="form-label" for="full_name">Full Name</label>
+        <input type="text" id="full_name" class="form-control" required placeholder="John Doe">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="username">Username</label>
+          <input type="text" id="username" class="form-control" required placeholder="johndoe">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="phone">Phone Number</label>
+          <input type="tel" id="phone" class="form-control" placeholder="9876543210">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="email">Email Address</label>
+        <input type="email" id="email" class="form-control" required placeholder="john@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="password">Password (min 8 chars)</label>
+        <input type="password" id="password" class="form-control" required minlength="8" placeholder="••••••••">
+      </div>
+      <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">
+        Register Account
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-secondary);">
+      Already have an account? <a href="login.html" style="font-weight: 600;">Sign in here</a>
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/app.js"></script>
+<script>
+document.getElementById('register-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const payload = {
+    full_name: document.getElementById('full_name').value.trim(),
+    username: document.getElementById('username').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    phone: document.getElementById('phone').value.trim(),
+    password: document.getElementById('password').value,
+    gender: 'OTHER'
+  };
+
+  try {
+    await API.register(payload);
+    showToast('Account Created', 'Registration successful! Please login.', 'success');
+    setTimeout(() => { window.location.href = 'login.html'; }, 1000);
+  } catch (err) {
+    showToast('Registration Error', err.message, 'error');
+  }
+});
+</script>
+</body>
+</html>

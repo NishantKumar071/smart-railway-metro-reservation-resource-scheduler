@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search Trains — SmartRail AI+</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><span>🚂</span> SmartRail <span class="brand-accent">AI+</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+        <a href="search.html" class="nav-item active"><span class="nav-icon">🔍</span> Search Trains</a>
+        <a href="my-bookings.html" class="nav-item"><span class="nav-icon">🎫</span> My Bookings</a>
+        <a href="pnr.html" class="nav-item"><span class="nav-icon">📋</span> PNR Enquiry</a>
+        <a href="waitlist.html" class="nav-item"><span class="nav-icon">⏳</span> Waitlist Status</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">AI Engine</div>
+        <a href="ai-waitlist.html" class="nav-item"><span class="nav-icon">🤖</span> WL Prediction</a>
+        <a href="ai-recommend.html" class="nav-item"><span class="nav-icon">🎯</span> Train Recommender</a>
+        <a href="ai-seat.html" class="nav-item"><span class="nav-icon">💺</span> Seat Selection</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">System & OS</div>
+        <a href="telemetry.html" class="nav-item"><span class="nav-icon">⚙️</span> OS Telemetry</a>
+        <a href="admin.html" class="nav-item"><span class="nav-icon">👑</span> Admin Console</a>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="sidebar-user-avatar">NK</div>
+        <div style="flex:1"><div class="user-name" id="sidebar-user-name">Nishant</div></div>
+        <button onclick="logout()" style="background:none;border:none;color:white;cursor:pointer;">🚪</button>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Search & Book Trains</h1>
+      <p class="page-subtitle">Real-time schedule and seat inventory from MySQL database.</p>
+    </div>
+
+    <!-- Search Form -->
+    <div class="card" style="margin-bottom: 2rem;">
+      <div class="card-body">
+        <form id="train-search-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="search-source">From (Source Station)</label>
+              <select id="search-source" class="form-control" required>
+                <optgroup label="Delhi / NCR">
+                  <option value="NDLS">NDLS — New Delhi</option>
+                  <option value="DLI">DLI — Old Delhi Junction</option>
+                  <option value="NZM">NZM — Hazrat Nizamuddin</option>
+                  <option value="ANVT">ANVT — Anand Vihar Terminal</option>
+                </optgroup>
+                <optgroup label="Mumbai">
+                  <option value="BCT">BCT — Mumbai Central</option>
+                  <option value="CSMT">CSMT — Chhatrapati Shivaji Terminus</option>
+                  <option value="BDTS">BDTS — Bandra Terminus</option>
+                </optgroup>
+                <optgroup label="Kolkata">
+                  <option value="HWH">HWH — Howrah Junction</option>
+                  <option value="SDAH">SDAH — Sealdah</option>
+                </optgroup>
+                <optgroup label="Chennai / Tamil Nadu">
+                  <option value="MAS">MAS — Chennai Central</option>
+                  <option value="MS">MS — Chennai Egmore</option>
+                </optgroup>
+                <optgroup label="Bangalore / Karnataka">
+                  <option value="SBC">SBC — KSR Bengaluru City</option>
+                  <option value="YPR">YPR — Yesvantpur Junction</option>
+                </optgroup>
+                <optgroup label="Hyderabad / Telangana">
+                  <option value="SC">SC — Secunderabad Junction</option>
+                  <option value="HYB">HYB — Hyderabad Deccan</option>
+                </optgroup>
+                <optgroup label="Madhya Pradesh">
+                  <option value="BPL">BPL — Bhopal Junction</option>
+                  <option value="RKMP">RKMP — Rani Kamlapati</option>
+                  <option value="GWL">GWL — Gwalior Junction</option>
+                  <option value="INDB">INDB — Indore Junction</option>
+                  <option value="UJN">UJN — Ujjain Junction</option>
+                </optgroup>
+                <optgroup label="Uttar Pradesh">
+                  <option value="AGC">AGC — Agra Cantt</option>
+                  <option value="JHS">JHS — Jhansi Junction</option>
+                  <option value="CNB">CNB — Kanpur Central</option>
+                  <option value="LKO">LKO — Lucknow Charbagh</option>
+                  <option value="PRYJ">PRYJ — Prayagraj Junction</option>
+                  <option value="BSB">BSB — Varanasi Junction</option>
+                  <option value="DDU">DDU — Pt. Deen Dayal Upadhyaya Jn.</option>
+                  <option value="GKP">GKP — Gorakhpur Junction</option>
+                </optgroup>
+                <optgroup label="Bihar / Jharkhand">
+                  <option value="PNBE">PNBE — Patna Junction</option>
+                  <option value="GAYA">GAYA — Gaya Junction</option>
+                  <option value="DHN">DHN — Dhanbad Junction</option>
+                  <option value="RNC">RNC — Ranchi Junction</option>
+                </optgroup>
+                <optgroup label="Uttarakhand">
+                  <option value="DDN">DDN — Dehradun Terminal</option>
+                  <option value="HRW">HRW — Haridwar Junction</option>
+                  <option value="RKSH">RKSH — Rishikesh</option>
+                </optgroup>
+                <optgroup label="Rajasthan">
+                  <option value="JP">JP — Jaipur Junction</option>
+                  <option value="KOTA">KOTA — Kota Junction</option>
+                </optgroup>
+                <optgroup label="Gujarat">
+                  <option value="ADI">ADI — Ahmedabad Junction</option>
+                  <option value="BRC">BRC — Vadodara Junction</option>
+                  <option value="ST">ST — Surat</option>
+                </optgroup>
+                <optgroup label="Maharashtra">
+                  <option value="PUNE">PUNE — Pune Junction</option>
+                  <option value="NAG">NAG — Nagpur Junction</option>
+                </optgroup>
+                <optgroup label="Punjab / Haryana / Chandigarh">
+                  <option value="CDG">CDG — Chandigarh Junction</option>
+                  <option value="ASR">ASR — Amritsar Junction</option>
+                </optgroup>
+                <optgroup label="Jammu & Kashmir">
+                  <option value="JAT">JAT — Jammu Tawi</option>
+                  <option value="SVDK">SVDK — SMVD Katra</option>
+                </optgroup>
+                <optgroup label="Assam / North-East">
+                  <option value="GHY">GHY — Guwahati</option>
+                </optgroup>
+                <optgroup label="Odisha / Andhra Pradesh">
+                  <option value="BBS">BBS — Bhubaneswar</option>
+                  <option value="PURI">PURI — Puri</option>
+                  <option value="VSKP">VSKP — Visakhapatnam</option>
+                  <option value="BZA">BZA — Vijayawada Junction</option>
+                </optgroup>
+                <optgroup label="Kerala / Goa">
+                  <option value="TVC">TVC — Thiruvananthapuram Central</option>
+                  <option value="ERS">ERS — Ernakulam Junction</option>
+                  <option value="MAO">MAO — Madgaon Junction</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="search-dest">To (Destination Station)</label>
+              <select id="search-dest" class="form-control" required>
+                <optgroup label="Delhi / NCR">
+                  <option value="NDLS">NDLS — New Delhi</option>
+                  <option value="DLI">DLI — Old Delhi Junction</option>
+                  <option value="NZM">NZM — Hazrat Nizamuddin</option>
+                  <option value="ANVT">ANVT — Anand Vihar Terminal</option>
+                </optgroup>
+                <optgroup label="Mumbai">
+                  <option value="BCT">BCT — Mumbai Central</option>
+                  <option value="CSMT">CSMT — Chhatrapati Shivaji Terminus</option>
+                  <option value="BDTS">BDTS — Bandra Terminus</option>
+                </optgroup>
+                <optgroup label="Kolkata">
+                  <option value="HWH">HWH — Howrah Junction</option>
+                  <option value="SDAH">SDAH — Sealdah</option>
+                </optgroup>
+                <optgroup label="Chennai / Tamil Nadu">
+                  <option value="MAS">MAS — Chennai Central</option>
+                  <option value="MS">MS — Chennai Egmore</option>
+                </optgroup>
+                <optgroup label="Bangalore / Karnataka">
+                  <option value="SBC">SBC — KSR Bengaluru City</option>
+                  <option value="YPR">YPR — Yesvantpur Junction</option>
+                </optgroup>
+                <optgroup label="Hyderabad / Telangana">
+                  <option value="SC">SC — Secunderabad Junction</option>
+                  <option value="HYB">HYB — Hyderabad Deccan</option>
+                </optgroup>
+                <optgroup label="Madhya Pradesh">
+                  <option value="BPL">BPL — Bhopal Junction</option>
+                  <option value="RKMP">RKMP — Rani Kamlapati</option>
+                  <option value="GWL">GWL — Gwalior Junction</option>
+                  <option value="INDB">INDB — Indore Junction</option>
+                  <option value="UJN">UJN — Ujjain Junction</option>
+                </optgroup>
+                <optgroup label="Uttar Pradesh">
+                  <option value="AGC">AGC — Agra Cantt</option>
+                  <option value="JHS">JHS — Jhansi Junction</option>
+                  <option value="CNB">CNB — Kanpur Central</option>
+                  <option value="LKO">LKO — Lucknow Charbagh</option>
+                  <option value="PRYJ">PRYJ — Prayagraj Junction</option>
+                  <option value="BSB">BSB — Varanasi Junction</option>
+                  <option value="DDU">DDU — Pt. Deen Dayal Upadhyaya Jn.</option>
+                  <option value="GKP">GKP — Gorakhpur Junction</option>
+                </optgroup>
+                <optgroup label="Bihar / Jharkhand">
+                  <option value="PNBE">PNBE — Patna Junction</option>
+                  <option value="GAYA">GAYA — Gaya Junction</option>
+                  <option value="DHN">DHN — Dhanbad Junction</option>
+                  <option value="RNC">RNC — Ranchi Junction</option>
+                </optgroup>
+                <optgroup label="Uttarakhand">
+                  <option value="DDN">DDN — Dehradun Terminal</option>
+                  <option value="HRW">HRW — Haridwar Junction</option>
+                  <option value="RKSH">RKSH — Rishikesh</option>
+                </optgroup>
+                <optgroup label="Rajasthan">
+                  <option value="JP">JP — Jaipur Junction</option>
+                  <option value="KOTA">KOTA — Kota Junction</option>
+                </optgroup>
+                <optgroup label="Gujarat">
+                  <option value="ADI">ADI — Ahmedabad Junction</option>
+                  <option value="BRC">BRC — Vadodara Junction</option>
+                  <option value="ST">ST — Surat</option>
+                </optgroup>
+                <optgroup label="Maharashtra">
+                  <option value="PUNE">PUNE — Pune Junction</option>
+                  <option value="NAG">NAG — Nagpur Junction</option>
+                </optgroup>
+                <optgroup label="Punjab / Haryana / Chandigarh">
+                  <option value="CDG">CDG — Chandigarh Junction</option>
+                  <option value="ASR">ASR — Amritsar Junction</option>
+                </optgroup>
+                <optgroup label="Jammu & Kashmir">
+                  <option value="JAT">JAT — Jammu Tawi</option>
+                  <option value="SVDK">SVDK — SMVD Katra</option>
+                </optgroup>
+                <optgroup label="Assam / North-East">
+                  <option value="GHY">GHY — Guwahati</option>
+                </optgroup>
+                <optgroup label="Odisha / Andhra Pradesh">
+                  <option value="BBS">BBS — Bhubaneswar</option>
+                  <option value="PURI">PURI — Puri</option>
+                  <option value="VSKP">VSKP — Visakhapatnam</option>
+                  <option value="BZA">BZA — Vijayawada Junction</option>
+                </optgroup>
+                <optgroup label="Kerala / Goa">
+                  <option value="TVC">TVC — Thiruvananthapuram Central</option>
+                  <option value="ERS">ERS — Ernakulam Junction</option>
+                  <option value="MAO">MAO — Madgaon Junction</option>
+                </optgroup>
+              </select>
+            </div>
+          </div>
+          <div class="form-row-3">
+            <div class="form-group">
+              <label class="form-label" for="search-date">Journey Date</label>
+              <input type="date" id="search-date" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="search-class">Travel Class</label>
+              <select id="search-class" class="form-control">
+                <option value="">All Classes</option>
+                <option value="3AC">3AC — AC 3-Tier</option>
+                <option value="2AC">2AC — AC 2-Tier</option>
+                <option value="1AC">1AC — AC First Class</option>
+                <option value="SL">SL — Sleeper</option>
+                <option value="CC">CC — AC Chair Car</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="search-quota">Quota (OS Priority)</label>
+              <select id="search-quota" class="form-control">
+                <option value="GENERAL">Normal / General (Priority 4)</option>
+                <option value="TATKAL">Tatkal (Priority 3)</option>
+                <option value="SENIOR_CITIZEN">Senior Citizen (Priority 2)</option>
+                <option value="EMERGENCY">Emergency (Priority 1)</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary" style="padding: 0.8rem 2rem;">
+            🔍 Search Trains
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Search Results Section -->
+    <div id="results-container"></div>
+
+    <!-- Booking Modal (Simple modal inside page) -->
+    <div id="booking-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+      <div class="card" style="width:100%; max-width:550px; max-height:90vh; overflow-y:auto;">
+        <div class="card-header">
+          <div class="card-title" id="modal-train-title">Book Ticket</div>
+          <button onclick="closeBookingModal()" style="background:none; border:none; font-size:1.2rem; cursor:pointer;">✕</button>
+        </div>
+        <div class="card-body">
+          <form id="booking-submission-form">
+            <input type="hidden" id="book-train-id">
+            <input type="hidden" id="book-coach-id">
+            <input type="hidden" id="book-fare">
+            <input type="hidden" id="book-class">
+
+            <div class="alert alert-info" id="modal-route-info" style="font-size:0.85rem;"></div>
+
+            <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem;">Passenger Details</h4>
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input type="text" id="pax-name" class="form-control" required placeholder="Passenger Name">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Age</label>
+                <input type="number" id="pax-age" class="form-control" required min="1" max="120" value="28">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Gender</label>
+                <select id="pax-gender" class="form-control">
+                  <option value="MALE">Male</option>
+                  <option value="FEMALE">Female</option>
+                  <option value="OTHER">Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Berth Preference</label>
+              <select id="pax-berth" class="form-control">
+                <option value="NO_PREFERENCE">No Preference</option>
+                <option value="LOWER">Lower Berth</option>
+                <option value="MIDDLE">Middle Berth</option>
+                <option value="UPPER">Upper Berth</option>
+                <option value="SIDE_LOWER">Side Lower</option>
+                <option value="SIDE_UPPER">Side Upper</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-primary" style="width:100%; justify-content:center; margin-top:1rem;" id="submit-booking-btn">
+              ⚡ Submit Booking via OS Priority Scheduler
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/app.js"></script>
+<script>
+checkAuth();
+
+// Set date picker min = today, max = 90 days ahead
+const today = new Date();
+const minDate = today.toISOString().split('T')[0];
+const maxDate = new Date(today.getTime() + 90 * 86400000).toISOString().split('T')[0];
+const dateInput = document.getElementById('search-date');
+dateInput.min = minDate;
+dateInput.max = maxDate;
+
+// Default date to tomorrow
+const tomorrow = new Date();
+tomorrow.setDate(tomorrow.getDate() + 1);
+dateInput.value = tomorrow.toISOString().split('T')[0];
+
+// Parse URL params
+const params = new URLSearchParams(window.location.search);
+if (params.get('source')) document.getElementById('search-source').value = params.get('source');
+if (params.get('dest')) document.getElementById('search-dest').value = params.get('dest');
+if (params.get('date')) dateInput.value = params.get('date');
+
+document.getElementById('train-search-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const src = document.getElementById('search-source').value;
+  const dst = document.getElementById('search-dest').value;
+  const dt = document.getElementById('search-date').value;
+  const cls = document.getElementById('search-class').value;
+  const quota = document.getElementById('search-quota').value;
+
+  const container = document.getElementById('results-container');
+  container.innerHTML = '<div class="loading"><div class="spinner"></div> Searching trains in MySQL database...</div>';
+
+  try {
+    const res = await API.searchTrains(src, dst, dt, cls, quota);
+    if (!res.trains || res.trains.length === 0) {
+      container.innerHTML = '<div class="card"><div class="card-body empty-state">No direct trains found on this route. Please try different stations (e.g., NDLS to HWH).</div></div>';
+      return;
+    }
+
+    container.innerHTML = res.trains.map(t => `
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-header">
+          <div>
+            <span style="font-size: 1.1rem; font-weight: 800;">${t.train_number} — ${t.train_name}</span>
+            <span class="badge badge-primary" style="margin-left: 0.5rem;">${t.train_type}</span>
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-muted);">Duration: ${t.duration}</div>
+        </div>
+        <div class="card-body">
+          <div class="route-line" style="margin-bottom: 1.5rem;">
+            <div>
+              <div style="font-size: 1.25rem; font-weight: 700;">${t.departure_time}</div>
+              <div style="font-size: 0.85rem; color: var(--text-secondary);">${t.source_name} (${t.source_code})</div>
+            </div>
+            <div style="flex:1; text-align:center; color: var(--text-muted); font-size: 0.8rem;">
+              ──── ${t.duration} ────
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 1.25rem; font-weight: 700;">${t.arrival_time}</div>
+              <div style="font-size: 0.85rem; color: var(--text-secondary);">${t.dest_name} (${t.dest_code})</div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem;">
+            ${t.coaches.map(c => `
+              <div style="border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; text-align: center; background: var(--surface-2);">
+                <div style="font-weight: 700; font-size: 1rem;">${c.coach_type} (${c.coach_number})</div>
+                <div style="font-size: 1.1rem; font-weight: 800; color: var(--primary); margin: 0.25rem 0;">₹${c.estimated_fare}</div>
+                <div style="margin-bottom: 0.75rem;">
+                  <span class="badge ${c.available_seats > 0 ? 'badge-success' : 'badge-warning'}">
+                    ${c.available_seats > 0 ? `AVL: ${c.available_seats}` : `WL: ${c.waitlist_count}/${c.max_waitlist}`}
+                  </span>
+                </div>
+                <button class="btn-primary-sm" style="width: 100%; justify-content: center;"
+                  onclick="openBookingModal(${t.train_id}, '${t.train_number}', '${t.train_name}', ${c.coach_id}, '${c.coach_number}', '${c.coach_type}', ${c.estimated_fare}, '${t.source_code}', '${t.dest_code}', '${dt}')">
+                  Book Now
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `).join('');
+  } catch (err) {
+    container.innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  }
+});
+
+let currentBookingContext = {};
+
+function openBookingModal(trainId, trainNum, trainName, coachId, coachNum, coachType, fare, src, dst, dt) {
+  currentBookingContext = { trainId, coachId, coachNum, coachType, fare, src, dst, dt };
+  document.getElementById('modal-train-title').textContent = `Book: ${trainNum} - ${trainName} (${coachType})`;
+  document.getElementById('modal-route-info').innerHTML = `<strong>Route:</strong> ${src} → ${dst} | <strong>Date:</strong> ${dt} | <strong>Fare:</strong> ₹${fare}`;
+  document.getElementById('booking-modal').style.display = 'flex';
+}
+
+function closeBookingModal() {
+  document.getElementById('booking-modal').style.display = 'none';
+}
+
+document.getElementById('booking-submission-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('submit-booking-btn');
+  btn.disabled = true;
+  btn.textContent = 'Processing via C++ / OS Threads...';
+
+  const payload = {
+    train_id: currentBookingContext.trainId,
+    coach_id: currentBookingContext.coachId,
+    journey_date: currentBookingContext.dt,
+    source_station: currentBookingContext.src,
+    dest_station: currentBookingContext.dst,
+    travel_class: currentBookingContext.coachType,
+    quota: document.getElementById('search-quota').value,
+    preferred_berth: document.getElementById('pax-berth').value,
+    passengers: [{
+      full_name: document.getElementById('pax-name').value,
+      age: parseInt(document.getElementById('pax-age').value),
+      gender: document.getElementById('pax-gender').value,
+      id_type: 'AADHAAR'
+    }],
+    total_fare: currentBookingContext.fare
+  };
+
+  try {
+    const res = await API.createBooking(payload);
+    closeBookingModal();
+    showToast('Booking Successful!', `PNR: ${res.pnr} (${res.booking_status})`, 'success');
+    setTimeout(() => {
+      window.location.href = `pnr.html?pnr=${res.pnr}`;
+    }, 1200);
+  } catch (err) {
+    showToast('Booking Failed', err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '⚡ Submit Booking via OS Priority Scheduler';
+  }
+});
+</script>
+</body>
+</html>

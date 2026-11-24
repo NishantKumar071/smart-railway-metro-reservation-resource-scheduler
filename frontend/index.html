@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartRail AI+ — Smart Railway Reservation System</title>
+<link rel="stylesheet" href="css/main.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="landing-page">
+
+<!-- Navigation -->
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-brand">
+      <span class="brand-icon">🚂</span>
+      <span class="brand-text">SmartRail <span class="brand-accent">AI+</span></span>
+    </div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#ai-section">AI Features</a>
+      <a href="#os-section">OS Concepts</a>
+      <a href="pages/login.html" class="btn-outline">Login</a>
+      <a href="pages/register.html" class="btn-primary-sm">Get Started</a>
+    </div>
+    <button class="nav-toggle" onclick="toggleNav()">☰</button>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-badge">🎓 B.Tech Academic Project · OSDBMS-V-2026-T281</div>
+    <h1 class="hero-title">
+      Smart Railway Reservation<br>
+      <span class="gradient-text">Powered by AI</span>
+    </h1>
+    <p class="hero-subtitle">
+      A complete railway booking platform demonstrating Operating Systems,
+      Database Management, and Artificial Intelligence concepts through
+      a production-grade implementation.
+    </p>
+    <div class="hero-actions">
+      <a href="pages/login.html" class="btn-primary">
+        🚀 Launch Application
+      </a>
+      <a href="pages/search.html" class="btn-secondary">
+        🔍 Search Trains
+      </a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-number" id="stat-trains">10</span>
+        <span class="stat-label">Demo Trains</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" id="stat-stations">20</span>
+        <span class="stat-label">Stations</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">6</span>
+        <span class="stat-label">Worker Threads</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">3</span>
+        <span class="stat-label">AI Models</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="train-card-demo">
+      <div class="train-card-header">
+        <span>🚄 Howrah Rajdhani</span>
+        <span class="badge-confirmed">AI Recommended</span>
+      </div>
+      <div class="train-card-body">
+        <div class="route-line">
+          <span class="station">NDLS</span>
+          <span class="line-dots">···🚂···</span>
+          <span class="station">HWH</span>
+        </div>
+        <div class="train-info-row">
+          <span>⏰ 16:55 → 10:00+1</span>
+          <span>🎯 AI: 94% match</span>
+        </div>
+        <div class="availability-row">
+          <span class="avail-badge">SL: 24 seats</span>
+          <span class="avail-badge">3AC: 8 seats</span>
+          <span class="avail-badge wl">2AC: WL 3</span>
+        </div>
+      </div>
+    </div>
+    <div class="ai-prediction-demo">
+      <div class="pred-header">🤖 AI Waitlist Prediction</div>
+      <div class="pred-meter">
+        <div class="meter-fill" style="width: 72%"></div>
+      </div>
+      <div class="pred-label">72% Confirmation Probability</div>
+      <div class="pred-factors">
+        ✓ Low WL position · ✓ 15+ days remaining
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Disclaimer -->
+<div class="disclaimer-banner">
+  ⚠️ <strong>Academic Demonstration System:</strong>
+  This is a B.Tech project demonstrating OS, DBMS, and AI concepts.
+  NOT connected to real IRCTC or Indian Railways systems.
+  All data is fictional and for educational purposes only.
+</div>
+
+<!-- Features Section -->
+<section class="features" id="features">
+  <div class="section-container">
+    <h2 class="section-title">Complete Feature Implementation</h2>
+    <p class="section-subtitle">Every feature is fully implemented — no placeholder buttons or fake data</p>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🎫</div>
+        <h3>Train Booking</h3>
+        <p>Search, select, and book tickets with real database transactions. Supports multiple passengers, classes, and quotas.</p>
+        <a href="pages/search.html" class="feature-link">Search Trains →</a>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📋</div>
+        <h3>PNR Enquiry</h3>
+        <p>Real-time PNR status with passenger details, seat allocation, and complete status history from the database.</p>
+        <a href="pages/pnr.html" class="feature-link">Check PNR →</a>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">❌</div>
+        <h3>Ticket Cancellation</h3>
+        <p>Cancel tickets with automatic waitlist promotion. Full transaction logging and refund processing.</p>
+        <a href="pages/my-bookings.html" class="feature-link">My Bookings →</a>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⏳</div>
+        <h3>Waitlist Management</h3>
+        <p>Priority-based waitlist with automatic confirmation when seats become available through cancellations.</p>
+        <a href="pages/waitlist.html" class="feature-link">Waitlist Status →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI Features Section -->
+<section class="ai-section" id="ai-section">
+  <div class="section-container">
+    <h2 class="section-title">🤖 AI-Powered Features</h2>
+    <p class="section-subtitle">Machine learning models trained and integrated — not just decorative UI</p>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="ai-card-header">
+          <span class="ai-icon">📊</span>
+          <h3>Waitlist Prediction</h3>
+        </div>
+        <p>Logistic Regression + Random Forest models predict the probability of your waitlisted ticket getting confirmed.</p>
+        <ul class="ai-features-list">
+          <li>✓ Actual ML model (not hardcoded)</li>
+          <li>✓ Accuracy, F1, ROC-AUC metrics</li>
+          <li>✓ Key influencing factors shown</li>
+        </ul>
+        <a href="pages/ai-waitlist.html" class="ai-btn">Try Prediction →</a>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-header">
+          <span class="ai-icon">🎯</span>
+          <h3>Train Recommendation</h3>
+        </div>
+        <p>AI-scored recommendations based on real train availability, departure preference, budget, and journey duration.</p>
+        <ul class="ai-features-list">
+          <li>✓ Real DB train data</li>
+          <li>✓ Multi-factor scoring</li>
+          <li>✓ Explanation provided</li>
+        </ul>
+        <a href="pages/ai-recommend.html" class="ai-btn">Get Recommendations →</a>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-header">
+          <span class="ai-icon">💺</span>
+          <h3>Seat Recommendation</h3>
+        </div>
+        <p>Intelligent berth suggestions based on passenger age, preferences, and real-time seat availability.</p>
+        <ul class="ai-features-list">
+          <li>✓ Passenger profile aware</li>
+          <li>✓ Senior-friendly lower berth priority</li>
+          <li>✓ Real-time availability check</li>
+        </ul>
+        <a href="pages/ai-seat.html" class="ai-btn">Seat Recommendation →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OS Concepts Section -->
+<section class="os-section" id="os-section">
+  <div class="section-container">
+    <h2 class="section-title">⚙️ OS Concepts — Live Implementation</h2>
+    <p class="section-subtitle">Not theoretical — these concepts run every time a booking is made</p>
+    <div class="os-grid">
+      <div class="os-card">
+        <div class="os-icon">🔀</div>
+        <h4>Multithreading</h4>
+        <p>6 worker threads process booking requests concurrently using Python's threading module</p>
+      </div>
+      <div class="os-card">
+        <div class="os-icon">📥</div>
+        <h4>Producer-Consumer</h4>
+        <p>HTTP handlers produce; worker threads consume from a bounded priority queue with Condition variables</p>
+      </div>
+      <div class="os-card">
+        <div class="os-icon">⚡</div>
+        <h4>Priority Scheduling</h4>
+        <p>EMERGENCY → SENIOR → TATKAL → NORMAL with deterministic tie-breaking via heapq</p>
+      </div>
+      <div class="os-card">
+        <div class="os-icon">🔒</div>
+        <h4>Mutex & Sync</h4>
+        <p>threading.Lock, threading.Condition, threading.Event for race condition prevention</p>
+      </div>
+      <div class="os-card">
+        <div class="os-icon">🛡️</div>
+        <h4>Deadlock Prevention</h4>
+        <p>Single-lock protocol: only one lock ever acquired at a time in the scheduler</p>
+      </div>
+      <div class="os-card">
+        <div class="os-icon">📊</div>
+        <h4>Live Telemetry</h4>
+        <p>Real-time worker thread metrics, queue depth, processing times — all from live system state</p>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top: 2rem;">
+      <a href="pages/telemetry.html" class="btn-primary">View Live OS Telemetry →</a>
+    </div>
+  </div>
+</section>
+
+<!-- Project Info -->
+<section class="project-info">
+  <div class="section-container">
+    <div class="info-grid">
+      <div class="info-card">
+        <h3>🎓 Academic Project</h3>
+        <table class="info-table">
+          <tr><td>University</td><td>Graphic Era (Deemed), Dehradun</td></tr>
+          <tr><td>Session</td><td>2026–2027</td></tr>
+          <tr><td>Semester</td><td>5th Semester</td></tr>
+          <tr><td>Team ID</td><td>OSDBMS-V-2026-T281</td></tr>
+          <tr><td>Mentor</td><td>Dr. Deepak Gaur</td></tr>
+        </table>
+      </div>
+      <div class="info-card">
+        <h3>👨‍💻 Team Members</h3>
+        <div class="team-member">
+          <div class="member-avatar">NK</div>
+          <div>
+            <strong>Nishant Kumar</strong>
+            <p>Team Lead — Architecture, C++ Backend, OS, AI</p>
+          </div>
+        </div>
+        <div class="team-member">
+          <div class="member-avatar">RT</div>
+          <div>
+            <strong>Robert Sandi Thomas</strong>
+            <p>Developer — DBMS, Testing, Backend Support</p>
+          </div>
+        </div>
+      </div>
+      <div class="info-card">
+        <h3>🛠️ Technology Stack</h3>
+        <div class="tech-tags">
+          <span class="tech-tag">Python 3.14</span>
+          <span class="tech-tag">FastAPI</span>
+          <span class="tech-tag">MySQL 8.0</span>
+          <span class="tech-tag">scikit-learn</span>
+          <span class="tech-tag">Threading</span>
+          <span class="tech-tag">Chart.js</span>
+          <span class="tech-tag">JWT Auth</span>
+          <span class="tech-tag">bcrypt</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-brand">
+      <span>🚂 SmartRail AI+</span>
+      <p>Academic Project — OSDBMS-V-2026-T281</p>
+    </div>
+    <div class="footer-links">
+      <a href="pages/dashboard.html">Dashboard</a>
+      <a href="pages/search.html">Search Trains</a>
+      <a href="pages/pnr.html">PNR Status</a>
+      <a href="pages/telemetry.html">OS Telemetry</a>
+      <a href="pages/ai-waitlist.html">AI Prediction</a>
+      <a href="pages/admin.html">Admin</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 SmartRail AI+ · Graphic Era University · Team OSDBMS-V-2026-T281</p>
+    <p class="disclaimer-small">
+      ⚠️ Academic demonstration only. Not affiliated with IRCTC or Indian Railways.
+    </p>
+  </div>
+</footer>
+
+<script>
+function toggleNav() {
+  document.querySelector('.nav-links').classList.toggle('active');
+}
+
+// Animate stats counter
+function animateCounter(el, target) {
+  let current = 0;
+  const step = target / 30;
+  const timer = setInterval(() => {
+    current = Math.min(current + step, target);
+    el.textContent = Math.floor(current);
+    if (current >= target) clearInterval(timer);
+  }, 50);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Scroll animations
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.feature-card, .ai-card, .os-card, .info-card').forEach(el => {
+    observer.observe(el);
+  });
+});
+</script>
+</body>
+</html>

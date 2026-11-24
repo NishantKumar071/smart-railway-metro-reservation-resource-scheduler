@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OS Telemetry — SmartRail AI+</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><span>🚂</span> SmartRail <span class="brand-accent">AI+</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+        <a href="search.html" class="nav-item"><span class="nav-icon">🔍</span> Search Trains</a>
+        <a href="my-bookings.html" class="nav-item"><span class="nav-icon">🎫</span> My Bookings</a>
+        <a href="pnr.html" class="nav-item"><span class="nav-icon">📋</span> PNR Enquiry</a>
+        <a href="waitlist.html" class="nav-item"><span class="nav-icon">⏳</span> Waitlist Status</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">AI Engine</div>
+        <a href="ai-waitlist.html" class="nav-item"><span class="nav-icon">🤖</span> WL Prediction</a>
+        <a href="ai-recommend.html" class="nav-item"><span class="nav-icon">🎯</span> Train Recommender</a>
+        <a href="ai-seat.html" class="nav-item"><span class="nav-icon">💺</span> Seat Selection</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">System & OS</div>
+        <a href="telemetry.html" class="nav-item active"><span class="nav-icon">⚙️</span> OS Telemetry</a>
+        <a href="admin.html" class="nav-item"><span class="nav-icon">👑</span> Admin Console</a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">⚙️ Operating System Telemetry Dashboard</h1>
+      <p class="page-subtitle">Live inspection of Worker Thread Pool, Producer-Consumer Request Queue, Mutex Contention, and Priority Scheduling metrics.</p>
+    </div>
+
+    <!-- Live OS Status Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon blue">🧵</div>
+        <div>
+          <div class="stat-value" id="os-threads">6</div>
+          <div class="stat-label">Worker Threads</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon purple">📥</div>
+        <div>
+          <div class="stat-value" id="os-queue-len">0</div>
+          <div class="stat-label">Priority Queue Depth</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">⚡</div>
+        <div>
+          <div class="stat-value" id="os-avg-proc">0 ms</div>
+          <div class="stat-label">Avg Processing Time</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon orange">🔒</div>
+        <div>
+          <div class="stat-value" id="os-lock-contention">0</div>
+          <div class="stat-label">Lock Wait Cycles</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Priority breakdown & Architecture details -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Priority Scheduling Breakdown (24h)</div></div>
+        <div class="card-body">
+          <canvas id="priorityChart" height="120"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">OS Architecture & Deadlock Safety</div></div>
+        <div class="card-body" style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+          <div style="margin-bottom: 0.75rem;">
+            <strong>🧵 Multithreading:</strong> Configurable pool of 6 worker threads consuming from a synchronized min-heap.
+          </div>
+          <div style="margin-bottom: 0.75rem;">
+            <strong>⚡ Priority Queue:</strong> Deterministic ordering via <code>(Priority, Timestamp, RequestID)</code>.
+          </div>
+          <div style="margin-bottom: 0.75rem;">
+            <strong>🔒 Deadlock Prevention:</strong> Single-lock acquisition hierarchy prevents circular-wait condition.
+          </div>
+          <div>
+            <strong>🛡️ Mutex Protection:</strong> <code>Condition Variable</code> coordination unblocks waiting workers atomically.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent OS Scheduling Execution Log -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">OS Worker Dispatch Audit Log</div>
+        <button class="btn-outline" onclick="loadTelemetry()" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">Refresh</button>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Request ID</th>
+                <th>Priority Level</th>
+                <th>Queue Wait (ms)</th>
+                <th>Processing (ms)</th>
+                <th>Worker Thread</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="telemetry-table-body">
+              <tr><td colspan="6" class="loading"><div class="spinner"></div> Loading telemetry data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/app.js"></script>
+<script>
+checkAuth();
+
+let chartInstance = null;
+
+async function loadTelemetry() {
+  try {
+    const data = await API.getTelemetry();
+
+    document.getElementById('os-threads').textContent = data.live_scheduler.worker_threads_configured;
+    document.getElementById('os-queue-len').textContent = data.live_scheduler.queue_length;
+    document.getElementById('os-avg-proc').textContent = `${data.db_stats_24h.avg_processing_ms} ms`;
+    document.getElementById('os-lock-contention').textContent = data.live_counters.lock_contentions;
+
+    // Render Priority Breakdown Chart
+    const ctx = document.getElementById('priorityChart').getContext('2d');
+    const pData = data.db_stats_24h.by_priority;
+
+    if (chartInstance) chartInstance.destroy();
+
+    chartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Emergency (P1)', 'Senior (P2)', 'Tatkal (P3)', 'Normal (P4)'],
+        datasets: [{
+          label: 'Requests Handled',
+          data: [pData.EMERGENCY || 0, pData.SENIOR_CITIZEN || 0, pData.TATKAL || 0, pData.NORMAL || 0],
+          backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#10b981'],
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+
+    // Populate Table
+    const tbody = document.getElementById('telemetry-table-body');
+    const list = data.recent_requests || [];
+
+    if (list.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No OS dispatch events logged yet.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = list.map(r => `
+      <tr>
+        <td><code>${r.request_id.substring(0, 12)}...</code></td>
+        <td><span class="badge ${r.priority_name === 'EMERGENCY' ? 'badge-danger' : r.priority_name === 'TATKAL' ? 'badge-primary' : 'badge-info'}">${r.priority_name}</span></td>
+        <td>${r.queue_wait_time_ms} ms</td>
+        <td>${r.processing_time_ms} ms</td>
+        <td>Thread #${r.worker_thread_id}</td>
+        <td><span class="badge ${r.result_status === 'COMPLETED' ? 'badge-success' : 'badge-danger'}">${r.result_status}</span></td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    document.getElementById('telemetry-table-body').innerHTML = `<tr><td colspan="6" class="alert alert-danger">${err.message}</td></tr>`;
+  }
+}
+
+loadTelemetry();
+setInterval(loadTelemetry, 5000); // Polling every 5s for live OS metrics
+</script>
+</body>
+</html>
